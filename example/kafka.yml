@@ -1,8 +1,8 @@
 startDelaySeconds: 0
 jmxConfigs:
-  - hostPort: localhost:9999
-#  - hostPort: 10.4.0.12:9999
-#  - hostPort: 10.4.0.13:9999
+  - hostPort: 10.4.0.11:9999
+  - hostPort: 10.4.0.12:9999
+  - hostPort: 10.4.0.13:9999
 
 #username:
 #password:
@@ -10,12 +10,7 @@ jmxConfigs:
 #ssl: false
 lowercaseOutputName: false
 whitelistObjectNames: [
-  "kafka.server:type=BrokerTopicMetrics,*",
   "kafka.server:type=ReplicaManager,*",
-  "kafka.cluster:type=Partition,name=UnderMinIsr,*",
-  "kafka.cluster:type=Partition,name=UnderReplicated,*",
-  "kafka.log:type=Log,name=NumLogSegments,*",
-  "kafka.log:type=Log,name=Size,*",
   "kafka.network:*"
 ]
 
@@ -101,6 +96,7 @@ rules:
       "$4": "$5"
       "$6": "$7"
       quantile: "0.$8"
+    fieldsSelect: ["95thPercentile","99thPercentile"]
   - pattern: kafka.(\w+)<type=(.+), name=(.+), (.+)=(.+)><>Count
     name: kafka_$1_$2_$3_count
     type: COUNTER
@@ -112,6 +108,7 @@ rules:
     labels:
       "$4": "$5"
       quantile: "0.$6"
+    fieldsSelect: ["95thPercentile","99thPercentile"]
   - pattern: kafka.(\w+)<type=(.+), name=(.+)><>Count
     name: kafka_$1_$2_$3_count
     type: COUNTER
@@ -120,3 +117,4 @@ rules:
     type: GAUGE
     labels:
       quantile: "0.$4"
+    fieldsSelect: ["95thPercentile","99thPercentile"]

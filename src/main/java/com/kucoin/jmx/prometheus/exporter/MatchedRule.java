@@ -18,6 +18,7 @@ public class MatchedRule {
     final List<String> labelValues;
     final Double value;
     final double valueFactor;
+    final List<String> fieldsSelect;
 
     private static final MatchedRule _unmatched = new MatchedRule();
 
@@ -30,6 +31,7 @@ public class MatchedRule {
         this.labelValues = null;
         this.value = null;
         this.valueFactor = 1.0;
+        this.fieldsSelect= null;
     }
 
     public MatchedRule(
@@ -40,7 +42,8 @@ public class MatchedRule {
             final List<String> labelNames,
             final List<String> labelValues,
             final Double value,
-            double valueFactor) {
+            double valueFactor,
+            final List<String> fieldsSelect) {
         this.name = name;
         this.matchName = matchName;
         this.type = type;
@@ -49,6 +52,7 @@ public class MatchedRule {
         this.labelValues = labelValues;
         this.value = value;
         this.valueFactor = valueFactor;
+        this.fieldsSelect = fieldsSelect;
     }
 
     /**

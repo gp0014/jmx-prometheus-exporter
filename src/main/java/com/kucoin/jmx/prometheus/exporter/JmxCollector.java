@@ -56,6 +56,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
         Type type = Type.UNKNOWN;
         ArrayList<String> labelNames;
         ArrayList<String> labelValues;
+        List<String> fieldsSelect;
     }
 
     private static class JMXConfig {
@@ -254,6 +255,11 @@ public class JmxCollector extends Collector implements Collector.Describable {
                 if (rule.name != null && rule.pattern == null) {
                     throw new IllegalArgumentException("Must provide pattern, if name is given: " + yamlRule);
                 }
+
+                if (yamlRule.containsKey("fieldsSelect")) {
+                    final List<String> fieldsSelect = (List<String>) yamlRule.get("fieldsSelect");
+                    rule.fieldsSelect = fieldsSelect;
+                }
             }
         } else {
             // Default to a single default rule.
@@ -410,7 +416,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
                 }
             }
 
-            return new MatchedRule(fullname, matchName, type, help, labelNames, labelValues, value, valueFactor);
+            return new MatchedRule(fullname, matchName, type, help, labelNames, labelValues, value, valueFactor, null);
         }
 
         public void recordBean(
@@ -517,13 +523,26 @@ public class JmxCollector extends Collector implements Collector.Describable {
                     }
                 }
 
-                matchedRule = new MatchedRule(name, matchName, rule.type, help, labelNames, labelValues, value, rule.valueFactor);
+                matchedRule = new MatchedRule(name, matchName, rule.type, help, labelNames, labelValues, value, rule.valueFactor, rule.fieldsSelect);
                 addToCache(rule, matchName, matchedRule);
                 break;
             }
 
             if (matchedRule.isUnmatched()) {
                 return;
+            }
+
+            if (matchedRule.fieldsSelect != null) {
+                boolean fieldMatch = false;
+                for (final String field : matchedRule.fieldsSelect) {
+                    if (field.equals(attrName)) {
+                        fieldMatch = true;
+                        break;
+                    }
+                }
+                if (!fieldMatch) {
+                    return;
+                }
             }
 
             Number value;
