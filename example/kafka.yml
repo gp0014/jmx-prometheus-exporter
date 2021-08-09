@@ -9,7 +9,15 @@ jmxConfigs:
 #jmxUrl: service:jmx:rmi:///jndi/rmi://127.0.0.1:19092/jmxrmi
 #ssl: false
 lowercaseOutputName: false
-whitelistObjectNames: ["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec"]
+whitelistObjectNames: [
+  "kafka.server:type=BrokerTopicMetrics,*",
+  "kafka.server:type=ReplicaManager,*",
+  "kafka.cluster:type=Partition,name=UnderMinIsr,*",
+  "kafka.cluster:type=Partition,name=UnderReplicated,*",
+  "kafka.log:type=Log,name=NumLogSegments,*",
+  "kafka.log:type=Log,name=Size,*",
+  "kafka.network:*"
+]
 
 rules:
   # Special cases and very specific rules
