@@ -2,6 +2,8 @@ package com.kucoin.jmx.prometheus.exporter;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.Counter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.management.MalformedObjectNameException;
@@ -11,8 +13,8 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +29,21 @@ public class JmxCollector extends Collector implements Collector.Describable {
             .name("jmx_config_reload_failure_total")
             .help("Number of times configuration have failed to be reloaded.").register();
 
-    private static final Logger LOGGER = Logger.getLogger(JmxCollector.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(JmxCollector.class.getName());
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
+
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+        @Override
+        public Thread newThread(Runnable r) {
+            final Thread thread = new Thread(r);
+            thread.setName("scraper-" + threadNumber.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+        }
+    });
+
 
     static class Rule {
         Pattern pattern;
@@ -92,14 +108,14 @@ public class JmxCollector extends Collector implements Collector.Describable {
                 config.lastUpdate = configFile.lastModified();
                 configReloadSuccess.inc();
             } catch (Exception e) {
-                LOGGER.severe("Configuration reload failed: " + e);
+                LOGGER.error("Configuration reload failed: " + e);
                 configReloadFailure.inc();
             } finally {
                 fr.close();
             }
 
         } catch (IOException e) {
-            LOGGER.severe("Configuration reload failed: " + e);
+            LOGGER.error("Configuration reload failed: " + e);
             configReloadFailure.inc();
         }
     }
@@ -108,7 +124,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
         if (configFile != null) {
             long mtime = configFile.lastModified();
             if (mtime > config.lastUpdate) {
-                LOGGER.fine("Configuration file changed, reloading...");
+                LOGGER.info("Configuration file changed, reloading...");
                 reloadConfig();
             }
         }
@@ -450,7 +466,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
                     try {
                         value = Double.valueOf(val);
                     } catch (NumberFormatException e) {
-                        LOGGER.fine("Unable to parse configured value '" + val + "' to number for bean: " + beanName + attrName + ": " + beanValue);
+                        LOGGER.info("Unable to parse configured value '" + val + "' to number for bean: " + beanName + attrName + ": " + beanValue);
                         return;
                     }
                 }
@@ -519,12 +535,12 @@ public class JmxCollector extends Collector implements Collector.Describable {
             } else if (beanValue instanceof Boolean) {
                 value = (Boolean) beanValue ? 1 : 0;
             } else {
-                LOGGER.fine("Ignoring unsupported bean: " + beanName + attrName + ": " + beanValue);
+                LOGGER.info("Ignoring unsupported bean: " + beanName + attrName + ": " + beanValue);
                 return;
             }
 
             // Add to samples.
-            LOGGER.fine("add metric sample: " + matchedRule.name + " " + matchedRule.labelNames + " " + matchedRule.labelValues + " " + value.doubleValue());
+            LOGGER.info("add metric sample: " + matchedRule.name + " " + matchedRule.labelNames + " " + matchedRule.labelValues + " " + value.doubleValue());
             addSample(new MetricFamilySamples.Sample(matchedRule.name, matchedRule.labelNames, matchedRule.labelValues, value.doubleValue()), matchedRule.type, matchedRule.help);
         }
 
@@ -543,7 +559,6 @@ public class JmxCollector extends Collector implements Collector.Describable {
                 ((start - createTimeNanoSecs) / 1000000000L < config.startDelaySeconds)) {
             throw new IllegalStateException("JMXCollector waiting for startDelaySeconds");
         }
-        final ExecutorService executorService = Executors.newFixedThreadPool(config.jmxConfigs.size());
         final CountDownLatch countDownLatch = new CountDownLatch(config.jmxConfigs.size());
         final AtomicInteger error = new AtomicInteger(0);
         for (final JMXConfig jmxConfig : config.jmxConfigs) {
@@ -556,7 +571,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
                     error.incrementAndGet();
                     StringWriter sw = new StringWriter();
                     e.printStackTrace(new PrintWriter(sw));
-                    LOGGER.severe("JMX scrape failed: " + sw);
+                    LOGGER.error("JMX scrape failed: " + sw);
                 }
                 countDownLatch.countDown();
             });

@@ -1,5 +1,8 @@
 package com.kucoin.jmx.prometheus.exporter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeType;
@@ -15,11 +18,10 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 class JmxScraper {
-    private static final Logger logger = Logger.getLogger(JmxScraper.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(JmxScraper.class.getName());
 
 
     public interface MBeanReceiver {
@@ -102,7 +104,7 @@ class JmxScraper {
             for (ObjectName objectName : mBeanNames) {
                 long start = System.nanoTime();
                 scrapeBean(beanConn, objectName);
-                logger.fine("TIME: " + (System.nanoTime() - start) + " ns for " + objectName.toString());
+                logger.info("TIME: " + (System.nanoTime() - start) + " ns for " + objectName.toString());
             }
         } finally {
             if (jmxc != null) {
@@ -295,7 +297,7 @@ class JmxScraper {
     }
 
     private static void logScrape(String name, String msg) {
-        logger.log(Level.FINE, "scrape: '" + name + "': " + msg);
+        logger.info("scrape: '" + name + "': " + msg);
     }
 
     private static class StdoutWriter implements MBeanReceiver {
