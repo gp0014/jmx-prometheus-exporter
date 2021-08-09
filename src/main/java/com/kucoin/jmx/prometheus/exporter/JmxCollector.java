@@ -414,6 +414,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
         }
 
         public void recordBean(
+                String jmxURL,
                 String domain,
                 LinkedHashMap<String, String> beanProperties,
                 LinkedList<String> attrKeys,
@@ -539,9 +540,13 @@ public class JmxCollector extends Collector implements Collector.Describable {
                 return;
             }
 
+            ArrayList<String> labelNames = new ArrayList<>(matchedRule.labelNames);
+            ArrayList<String> labelValues = new ArrayList<>(matchedRule.labelValues);
+            labelNames.add("jmxURL");
+            labelValues.add(jmxURL);
             // Add to samples.
-            LOGGER.info("add metric sample: " + matchedRule.name + " " + matchedRule.labelNames + " " + matchedRule.labelValues + " " + value.doubleValue());
-            addSample(new MetricFamilySamples.Sample(matchedRule.name, matchedRule.labelNames, matchedRule.labelValues, value.doubleValue()), matchedRule.type, matchedRule.help);
+            LOGGER.info("add metric sample: " + matchedRule.name + " " + labelNames + " " + labelValues + " " + value.doubleValue());
+            addSample(new MetricFamilySamples.Sample(matchedRule.name, labelNames, labelValues, value.doubleValue()), matchedRule.type, matchedRule.help);
         }
 
     }

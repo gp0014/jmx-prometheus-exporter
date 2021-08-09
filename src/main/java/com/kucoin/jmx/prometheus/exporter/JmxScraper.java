@@ -26,6 +26,7 @@ class JmxScraper {
 
     public interface MBeanReceiver {
         void recordBean(
+                String jmxURL,
                 String domain,
                 LinkedHashMap<String, String> beanProperties,
                 LinkedList<String> attrKeys,
@@ -188,6 +189,7 @@ class JmxScraper {
             }
             logScrape(domain + beanProperties + attrName, value.toString());
             this.receiver.recordBean(
+                    jmxUrl,
                     domain,
                     beanProperties,
                     attrKeys,
@@ -302,6 +304,7 @@ class JmxScraper {
 
     private static class StdoutWriter implements MBeanReceiver {
         public void recordBean(
+                String jmxURL,
                 String domain,
                 LinkedHashMap<String, String> beanProperties,
                 LinkedList<String> attrKeys,

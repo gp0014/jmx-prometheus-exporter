@@ -1,8 +1,8 @@
 startDelaySeconds: 0
 jmxConfigs:
-  - hostPort: 10.4.0.11:9999
-  - hostPort: 10.4.0.12:9999
-  - hostPort: 10.4.0.13:9999
+  - hostPort: localhost:9999
+#  - hostPort: 10.4.0.12:9999
+#  - hostPort: 10.4.0.13:9999
 
 #username:
 #password:
