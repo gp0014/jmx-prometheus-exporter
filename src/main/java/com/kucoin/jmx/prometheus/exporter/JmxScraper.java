@@ -104,7 +104,7 @@ class JmxScraper {
             for (ObjectName objectName : mBeanNames) {
                 long start = System.nanoTime();
                 scrapeBean(beanConn, objectName);
-                logger.info("TIME: " + (System.nanoTime() - start) + " ns for " + objectName.toString());
+                logger.debug("TIME: " + (System.nanoTime() - start) + " ns for " + objectName.toString());
             }
         } finally {
             if (jmxc != null) {
@@ -298,7 +298,7 @@ class JmxScraper {
     }
 
     private static void logScrape(String name, String msg) {
-        logger.info("scrape: '" + name + "': " + msg);
+        logger.debug("scrape: '{}': {}", name, msg);
     }
 
     private static class StdoutWriter implements MBeanReceiver {

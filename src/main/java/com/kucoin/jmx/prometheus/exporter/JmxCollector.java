@@ -564,7 +564,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
             labelNames.add("jmxURL");
             labelValues.add(jmxURL);
             // Add to samples.
-            LOGGER.info("add metric sample: " + matchedRule.name + " " + labelNames + " " + labelValues + " " + value.doubleValue());
+            LOGGER.debug("add metric sample: " + matchedRule.name + " " + labelNames + " " + labelValues + " " + value.doubleValue());
             addSample(new MetricFamilySamples.Sample(matchedRule.name, labelNames, labelValues, value.doubleValue()), matchedRule.type, matchedRule.help);
         }
 
