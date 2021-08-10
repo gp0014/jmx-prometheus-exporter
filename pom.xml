@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kucoin</groupId>
     <artifactId>jmx_prometheus_exporter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>jmx_prometheus_exporter</name>
     <description>Export jmx metrics to prometheus</description>
     <dependencies>
