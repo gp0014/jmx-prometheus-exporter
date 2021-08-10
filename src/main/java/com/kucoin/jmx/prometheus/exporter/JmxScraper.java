@@ -101,11 +101,11 @@ class JmxScraper {
             // Now that we have *only* the whitelisted mBeans, remove any old ones from the cache:
             jmxMBeanPropertyCache.onlyKeepMBeans(mBeanNames);
 
+            long start = System.nanoTime();
             for (ObjectName objectName : mBeanNames) {
-                long start = System.nanoTime();
                 scrapeBean(beanConn, objectName);
-                logger.debug("TIME: " + (System.nanoTime() - start) + " ns for " + objectName.toString());
             }
+            logger.info("TIME: {} ns for scrape {}", System.nanoTime() - start, jmxUrl);
         } finally {
             if (jmxc != null) {
                 jmxc.close();
