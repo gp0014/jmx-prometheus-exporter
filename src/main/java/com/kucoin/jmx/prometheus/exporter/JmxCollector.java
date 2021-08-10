@@ -10,10 +10,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -334,7 +331,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
 
     class Receiver implements JmxScraper.MBeanReceiver {
         Map<String, MetricFamilySamples> metricFamilySamplesMap =
-                new HashMap<>();
+                new ConcurrentHashMap<>();
 
         Config config;
         MatchedRulesCache.StalenessTracker stalenessTracker;
