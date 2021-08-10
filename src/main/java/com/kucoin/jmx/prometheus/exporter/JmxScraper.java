@@ -17,7 +17,6 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.*;
-import java.util.logging.Level;
 
 
 class JmxScraper {

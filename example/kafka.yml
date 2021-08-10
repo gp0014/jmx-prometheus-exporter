@@ -11,7 +11,13 @@ jmxConfigs:
 lowercaseOutputName: false
 whitelistObjectNames: [
   "kafka.server:type=ReplicaManager,*",
-  "kafka.network:*"
+  "kafka.network:type=Processor,*",
+  "kafka.network:type=RequestChannel,*",
+  "kafka.network:type=SocketServer,*",
+  "kafka.network:type=RequestMetrics,name=*,request=Produce,*",
+  "kafka.network:type=RequestMetrics,name=*,request=FetchConsumer,*",
+  "kafka.network:type=RequestMetrics,name=*,request=FetchFollower,*",
+  "kafka.network:type=RequestMetrics,name=*,request=OffsetCommit,*"
 ]
 
 rules:
