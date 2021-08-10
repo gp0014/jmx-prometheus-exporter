@@ -359,7 +359,9 @@ public class JmxCollector extends Collector implements Collector.Describable {
                 mfs = new MetricFamilySamples(sample.name, type, help, new ArrayList<>());
                 metricFamilySamplesMap.put(sample.name, mfs);
             }
-            mfs.samples.add(sample);
+            synchronized (mfs.samples) {
+                mfs.samples.add(sample);
+            }
         }
 
         // Add the matched rule to the cached rules and tag it as not stale
